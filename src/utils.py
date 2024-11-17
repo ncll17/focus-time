@@ -2,6 +2,7 @@ from pathlib import Path
 import yaml
 import pickle
 from typing import Dict, Any
+from torch import nn
 
 
 def validate_config(config: Dict[str, Any]) -> None:
@@ -49,3 +50,40 @@ def safe_save_pickle(data: Any, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("wb") as f:
         pickle.dump(data, f)
+
+
+def load_model(
+    model_path: str | Path, config: dict, model_class: nn.Module, cfg: dict, device: str
+) -> tuple[nn.Module, dict]:
+    """
+    Load a saved model and its vocabulary mapping.
+
+    Args:
+        model_path: Path to the saved model checkpoint
+        config: Optional model configuration dictionary
+
+    Returns:
+        tuple: (loaded_model, app_to_idx_mapping)
+    """
+    checkpoint = torch.load(model_path)
+    app_to_idx = checkpoint["app_to_idx"]
+
+    # Get vocabulary size from the saved state dict
+    vocab_size = len(app_to_idx)
+
+    # Initialize model with same configuration
+    model = model_class(
+        vocab_size=vocab_size + 1,
+        d_model=cfg.get("model", {}).get("d_model", 64),
+        nhead=cfg.get("model", {}).get("nhead", 4),
+        seq_length=cfg.get("model", {}).get("seq_length", 64),
+        n_layers=cfg.get("model", {}).get("num_encoder_layers", 3),
+    )
+
+    # Load the saved state
+    model.load_state_dict(checkpoint["model_state_dict"])
+    # model.eval()  # Set to evaluation mode
+
+    logger.info(f"Model loaded from {model_path}")
+
+    return model, checkpoint["app_to_idx"]

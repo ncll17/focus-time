@@ -17,7 +17,7 @@ from data.load_and_preprocess import (
 from data.datasets import AppSequenceDataset, PreloadedDataset
 from models.transformer_models import ShallowTransformerWithAttention
 from training.iterations import train_epoch, evaluate
-from utils import load_config, safe_load_pickle, safe_save_pickle
+from utils import load_config, safe_load_pickle, safe_save_pickle, load_model
 
 
 def setup_data(cfg):
@@ -118,13 +118,22 @@ def train(cfg):
 
     # Initialize model
     logger.info("Initializing model")
-    model = ShallowTransformerWithAttention(
-        vocab_size=len(app_to_idx) + 1,  # +1 for MASK
-        d_model=cfg.get("model", {}).get("d_model", 64),
-        nhead=cfg.get("model", {}).get("nhead", 4),
-        seq_length=seq_length,
-        n_layers=cfg.get("model", {}).get("num_encoder_layers", 3),
-    ).to(device)
+    if cfg.get("training", {}).get("pretrained_model_path", None):
+        model, app_to_idx = load_model(
+            cfg.get("training", {}).get("pretrained_model_path"),
+            cfg,
+            ShallowTransformerWithAttention,
+            cfg,
+            device,
+        )
+    else:
+        model = ShallowTransformerWithAttention(
+            vocab_size=len(app_to_idx) + 1,  # +1 for MASK
+            d_model=cfg.get("model", {}).get("d_model", 64),
+            nhead=cfg.get("model", {}).get("nhead", 4),
+            seq_length=seq_length,
+            n_layers=cfg.get("model", {}).get("num_encoder_layers", 3),
+        ).to(device)
 
     # Setup training components
     criterion = nn.CrossEntropyLoss(ignore_index=-100)

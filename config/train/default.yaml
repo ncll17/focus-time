@@ -23,5 +23,6 @@ training:
   random_seed: 42
   lr: 1e-4
   device: "cuda"  # Will fall back to CPU if CUDA not available
-  save_model_path: "models/app_sequence_model_2st_round.pt"
+  pretrained_model_path: "models/app_sequence_model_2st_round.pt"
+  save_model_path: "models/app_sequence_model_3st_round.pt"
   preload_dataset: true # Use preloaded dataset for faster training
