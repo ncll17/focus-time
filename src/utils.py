@@ -84,7 +84,5 @@ def load_model(
     # Load the saved state
     model.load_state_dict(checkpoint["model_state_dict"])
     # model.eval()  # Set to evaluation mode
-
-    logger.info(f"Model loaded from {model_path}")
-
+    model = model.to(device)
     return model, checkpoint["app_to_idx"]
