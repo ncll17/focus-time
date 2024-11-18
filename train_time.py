@@ -15,7 +15,7 @@ from data.load_and_preprocess import (
     create_vocab,
 )
 from data.datasets import AppSequenceDataset, PreloadedDataset
-from models.transformer_models import ShallowTransformerWithAttention
+from models.transformer_models import ShallowTransformerTimeWithAttention
 from training.iterations import train_epoch, evaluate
 from utils import load_config, safe_load_pickle, safe_save_pickle, load_model
 
@@ -62,6 +62,7 @@ def create_datasets(sequences, app_to_idx, cfg, device):
         app_to_idx,
         sequence_length=seq_length,
         mask_prob=cfg.get("training", {}).get("mask_prob", 0.15),
+        include_time=True,
     )
 
     df_sequences = pd.DataFrame(sequences)
@@ -122,12 +123,12 @@ def train(cfg):
         model, app_to_idx = load_model(
             cfg.get("training", {}).get("pretrained_model_path"),
             cfg,
-            ShallowTransformerWithAttention,
+            ShallowTransformerTimeWithAttention,
             cfg,
             device,
         )
     else:
-        model = ShallowTransformerWithAttention(
+        model = ShallowTransformerTimeWithAttention(
             vocab_size=len(app_to_idx) + 1,  # +1 for MASK
             d_model=cfg.get("model", {}).get("d_model", 64),
             nhead=cfg.get("model", {}).get("nhead", 4),
@@ -158,8 +159,8 @@ def train(cfg):
 
         # Log metrics
         writer.add_scalar("Loss/train", train_loss, epoch)
-        writer.add_scalar("Accuracy/train", train_accuracy, epoch)
         writer.add_scalar("Loss/validation", val_loss, epoch)
+        writer.add_scalar("Accuracy/train", train_accuracy, epoch)
         writer.add_scalar("Accuracy/validation", val_accuracy, epoch)
         writer.add_scalar("Learning_rate", optimizer.param_groups[0]["lr"], epoch)
 
@@ -168,8 +169,8 @@ def train(cfg):
 
         logger.info(f"Epoch {epoch+1}/{n_epochs}")
         logger.info(f"Train Loss: {train_loss:.4f}")
-        logger.info(f"Train Accuracy: {train_accuracy:.4f}")
         logger.info(f"Val Loss: {val_loss:.4f}")
+        logger.info(f"Train Accuracy: {train_accuracy:.4f}")
         logger.info(f"Val Accuracy: {val_accuracy:.4f}")
 
     writer.close()
@@ -190,6 +191,6 @@ def train(cfg):
 
 if __name__ == "__main__":
     logger.info("Loading and validating configuration")
-    cfg_path = Path("config/train/default.yaml")
+    cfg_path = Path("config/train/default_time.yaml")
     cfg = load_config(cfg_path)
     train(cfg)
