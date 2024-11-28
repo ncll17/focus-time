@@ -13,7 +13,7 @@ model:
   d_model: 64
   nhead: 4
   num_encoder_layers: 3
-  dim_feedforward: 128
+  dim_feedforward: 256
   dropout: 0.1
 
 training:
@@ -23,6 +23,6 @@ training:
   random_seed: 42
   lr: 1e-4
   device: "cuda"  # Will fall back to CPU if CUDA not available
-  pretrained_model_path: "models/app_sequence_model_3st_round.pt"
-  save_model_path: "models/app_sequence_model_4st_round.pt"
+  pretrained_model_path: null
+  save_model_path: "models/app_sequence_model_with_time_3st_round.pt"
   preload_dataset: true # Use preloaded dataset for faster training
