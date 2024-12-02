@@ -101,10 +101,13 @@ class ShallowTransformerWithAttention(nn.Module):
             return logits, attention_weights
         return logits
 
+
 class ShallowTransformerTimeWithAttention(nn.Module):
-    def __init__(self, vocab_size, d_model=64, nhead=4, seq_length=64, n_layers=3, cfg=None):
+    def __init__(
+        self, vocab_size, d_model=64, nhead=4, seq_length=64, n_layers=3, cfg=None
+    ):
         super().__init__()
-        
+
         # Configuration for extra inputs
         self.cfg = cfg if cfg else {}
         self.extra_inputs = self.cfg.get("extra_inputs", {})
@@ -115,13 +118,19 @@ class ShallowTransformerTimeWithAttention(nn.Module):
 
         # Additional feature projections based on cfg
         self.mouse_clicks_projection = (
-            nn.Linear(1, d_model) if self.extra_inputs.get("mouseClicks", False) else None
+            nn.Linear(1, d_model)
+            if self.extra_inputs.get("mouseClicks", False)
+            else None
         )
         self.mouse_scroll_projection = (
-            nn.Linear(1, d_model) if self.extra_inputs.get("mouseScroll", False) else None
+            nn.Linear(1, d_model)
+            if self.extra_inputs.get("mouseScroll", False)
+            else None
         )
         self.keystrokes_projection = (
-            nn.Linear(1, d_model) if self.extra_inputs.get("keystrokes", False) else None
+            nn.Linear(1, d_model)
+            if self.extra_inputs.get("keystrokes", False)
+            else None
         )
         self.mic_projection = (
             nn.Linear(1, d_model) if self.extra_inputs.get("mic", False) else None
@@ -130,7 +139,9 @@ class ShallowTransformerTimeWithAttention(nn.Module):
             nn.Linear(1, d_model) if self.extra_inputs.get("camera", False) else None
         )
         self.app_quality_projection = (
-            nn.Linear(1, d_model) if self.extra_inputs.get("app_quality", False) else None
+            nn.Linear(1, d_model)
+            if self.extra_inputs.get("app_quality", False)
+            else None
         )
 
         # Calculating the size of the final concatenated embedding
@@ -151,7 +162,9 @@ class ShallowTransformerTimeWithAttention(nn.Module):
         self.combined_d_model = feature_count * d_model
 
         # Positional embeddings of appropriate size
-        self.pos_embeddings = nn.Parameter(torch.randn(1, seq_length, self.combined_d_model))
+        self.pos_embeddings = nn.Parameter(
+            torch.randn(1, seq_length, self.combined_d_model)
+        )
         self.nhead = nhead
 
         # Transformer layers with updated d_model size
@@ -206,24 +219,32 @@ class ShallowTransformerTimeWithAttention(nn.Module):
 
         # Add mic projection if specified in cfg
         if self.extra_inputs.get("mic", False):
-            x_mic = self.mic_projection(kwargs["mic"].unsqueeze(-1))  # [batch_size, seq_len, d_model]
+            x_mic = self.mic_projection(
+                kwargs["mic"].unsqueeze(-1)
+            )  # [batch_size, seq_len, d_model]
             features.append(x_mic)
 
         # Add camera projection if specified in cfg
         if self.extra_inputs.get("camera", False):
-            x_camera = self.camera_projection(kwargs["camera"].unsqueeze(-1))  # [batch_size, seq_len, d_model]
+            x_camera = self.camera_projection(
+                kwargs["camera"].unsqueeze(-1)
+            )  # [batch_size, seq_len, d_model]
             features.append(x_camera)
 
         # Add app_quality projection if specified in cfg
         if self.extra_inputs.get("app_quality", False):
-            x_app_quality = self.app_quality_projection(kwargs["app_quality"].unsqueeze(-1))  # [batch_size, seq_len, d_model]
+            x_app_quality = self.app_quality_projection(
+                kwargs["app_quality"].unsqueeze(-1)
+            )  # [batch_size, seq_len, d_model]
             features.append(x_app_quality)
 
         # Concatenate along the feature dimension
         x = torch.cat(features, dim=-1)  # [batch_size, seq_len, combined_d_model]
 
         # Add positional embeddings
-        x = x + self.pos_embeddings[:, :x.size(1), :]  # Broadcasting for position encoding
+        x = (
+            x + self.pos_embeddings[:, : x.size(1), :]
+        )  # Broadcasting for position encoding
 
         # Create attention mask for transformer
         attention_mask = attention_mask == 0
@@ -238,4 +259,3 @@ class ShallowTransformerTimeWithAttention(nn.Module):
         logits = self.app_predictor(x)
 
         return logits
-

@@ -9,6 +9,7 @@ import torch
 from torch.utils.data import Dataset
 import random
 
+
 class AppSequenceDataset(Dataset):
     def __init__(
         self,
@@ -30,7 +31,7 @@ class AppSequenceDataset(Dataset):
 
     def __getitem__(self, idx):
         seq = self.sequences[idx]
-        
+
         # Convert apps to indices
         app_ids = [
             self.app_to_idx.get(app, self.app_to_idx["<UNK>"]) for app in seq["apps"]
@@ -73,13 +74,17 @@ class AppSequenceDataset(Dataset):
         if self.extra_inputs.get("mouseClicks", False):
             mouse_clicks = seq["mouseClicks"][: self.sequence_length]
             if len(mouse_clicks) < self.sequence_length:
-                mouse_clicks = mouse_clicks + [0] * (self.sequence_length - len(mouse_clicks))
+                mouse_clicks = mouse_clicks + [0] * (
+                    self.sequence_length - len(mouse_clicks)
+                )
             output["mouseClicks"] = torch.tensor(mouse_clicks, dtype=torch.float)
 
         if self.extra_inputs.get("mouseScroll", False):
             mouse_scroll = seq["mouseScroll"][: self.sequence_length]
             if len(mouse_scroll) < self.sequence_length:
-                mouse_scroll = mouse_scroll + [0] * (self.sequence_length - len(mouse_scroll))
+                mouse_scroll = mouse_scroll + [0] * (
+                    self.sequence_length - len(mouse_scroll)
+                )
             output["mouseScroll"] = torch.tensor(mouse_scroll, dtype=torch.float)
 
         if self.extra_inputs.get("keystrokes", False):
@@ -104,8 +109,9 @@ class AppSequenceDataset(Dataset):
         if self.extra_inputs.get("app_quality", False):
             app_quality = seq["app_quality"][: self.sequence_length]
             if len(app_quality) < self.sequence_length:
-                app_quality = app_quality + [5] * (self.sequence_length - len(app_quality))  # Default quality is 5
+                app_quality = app_quality + [5] * (
+                    self.sequence_length - len(app_quality)
+                )  # Default quality is 5
             output["app_quality"] = torch.tensor(app_quality, dtype=torch.float)
 
         return output
-

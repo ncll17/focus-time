@@ -47,7 +47,7 @@ def process_row(row):
 def create_exploded_df(df_day_point, app_quality_path):
     """Create exploded dataframe from day point data."""
     # Load app quality mapping from yaml file
-    with open(app_quality_path, 'r') as file:
+    with open(app_quality_path, "r") as file:
         app_quality_mapping = yaml.safe_load(file)
 
     # Create exploded dataframe
@@ -60,6 +60,7 @@ def create_exploded_df(df_day_point, app_quality_path):
     exploded_df["app_quality"] = exploded_df["app"].map(app_quality_mapping).fillna(5)
 
     return exploded_df
+
 
 def create_sequences(exploded_df, window_size=64, stride=8):
     """Create sequences using sliding window approach."""
@@ -107,6 +108,7 @@ def create_sequences(exploded_df, window_size=64, stride=8):
                 sequences.append(sequence)
 
     return sequences
+
 
 def create_vocab(sequences):
     """Create vocabulary mapping from sequences."""

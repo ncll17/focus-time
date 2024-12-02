@@ -17,11 +17,17 @@ def train_epoch(
         app_ids = batch["app_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         labels = batch["labels"].to(device)
-        
+
         # Collect all extra features if they exist
         extra_inputs = {}
         for feature_name in [
-            "durations", "mouseClicks", "mouseScroll", "keystrokes", "mic", "camera", "app_quality"
+            "durations",
+            "mouseClicks",
+            "mouseScroll",
+            "keystrokes",
+            "mic",
+            "camera",
+            "app_quality",
         ]:
             if feature_name in batch:
                 extra_inputs[feature_name] = batch[feature_name].to(device)
@@ -30,10 +36,7 @@ def train_epoch(
 
         # Forward pass: passing extra inputs dynamically based on model configuration
         outputs = model(
-            app_ids,
-            attention_mask,
-            **extra_inputs,
-            output_attentions=output_attentions
+            app_ids, attention_mask, **extra_inputs, output_attentions=output_attentions
         )
 
         if output_attentions:
@@ -48,14 +51,15 @@ def train_epoch(
 
         # Calculate accuracy
         predictions = outputs.argmax(dim=-1)
-        mask = labels != -100  # Use mask to ignore padding tokens during accuracy calculation
+        mask = (
+            labels != -100
+        )  # Use mask to ignore padding tokens during accuracy calculation
         correct_predictions += (predictions[mask] == labels[mask]).sum().item()
         total_predictions += mask.sum().item()
 
     avg_loss = total_loss / len(dataloader)
     accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0.0
     return avg_loss, accuracy
-
 
 
 def evaluate(model, dataloader, criterion, device, output_attentions=False):
@@ -71,11 +75,17 @@ def evaluate(model, dataloader, criterion, device, output_attentions=False):
             app_ids = batch["app_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["labels"].to(device)
-            
+
             # Collect all extra features if they exist
             extra_inputs = {}
             for feature_name in [
-                "durations", "mouseClicks", "mouseScroll", "keystrokes", "mic", "camera", "app_quality"
+                "durations",
+                "mouseClicks",
+                "mouseScroll",
+                "keystrokes",
+                "mic",
+                "camera",
+                "app_quality",
             ]:
                 if feature_name in batch:
                     extra_inputs[feature_name] = batch[feature_name].to(device)
@@ -85,7 +95,7 @@ def evaluate(model, dataloader, criterion, device, output_attentions=False):
                 app_ids,
                 attention_mask,
                 **extra_inputs,
-                output_attentions=output_attentions
+                output_attentions=output_attentions,
             )
 
             if output_attentions:
@@ -97,11 +107,12 @@ def evaluate(model, dataloader, criterion, device, output_attentions=False):
 
             # Calculate accuracy
             predictions = outputs.argmax(dim=-1)
-            mask = labels != -100  # Use mask to ignore padding tokens during accuracy calculation
+            mask = (
+                labels != -100
+            )  # Use mask to ignore padding tokens during accuracy calculation
             correct_predictions += (predictions[mask] == labels[mask]).sum().item()
             total_predictions += mask.sum().item()
 
     avg_loss = total_loss / len(dataloader)
     accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0.0
     return avg_loss, accuracy
-

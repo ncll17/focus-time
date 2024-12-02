@@ -30,8 +30,7 @@ def setup_data(cfg):
     if exploded_df is None:
         logger.info("Loading raw data and creating exploded_df")
         df_day_point, _ = load_raw_data(
-            data_paths["raw_data_path"],
-            data_paths["app_mappings_path"]
+            data_paths["raw_data_path"], data_paths["app_mappings_path"]
         )
         exploded_df = create_exploded_df(df_day_point, data_paths["app_quality_path"])
         safe_save_pickle(exploded_df, data_paths["exploded_df_path"])
@@ -63,7 +62,7 @@ def create_datasets(sequences, app_to_idx, cfg, device):
         app_to_idx,
         sequence_length=seq_length,
         mask_prob=cfg.get("training", {}).get("mask_prob", 0.15),
-        extra_inputs = cfg.get("extra_inputs", {})
+        extra_inputs=cfg.get("extra_inputs", {}),
     )
 
     df_sequences = pd.DataFrame(sequences)
@@ -130,7 +129,7 @@ def train(cfg):
             nhead=cfg.get("model", {}).get("nhead", 4),
             seq_length=seq_length,
             n_layers=cfg.get("model", {}).get("num_encoder_layers", 3),
-            cfg=cfg 
+            cfg=cfg,
         ).to(device)
 
     # Setup training components

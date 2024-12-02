@@ -1,9 +1,10 @@
 [project]
-name = "focus-time"
+name = "Insightful-nemanja-repo"
 version = "0.1.0"
-description = "focus time exp"
+description = "Default template for PDM package"
 authors = [
     {name = "Nemanja Cukaric", email = "nemanja@logikka.ai"},
+    {name = "despotmarkovic", email = "despotmarkovic@gmail.com"},
 ]
 
 dependencies = [
@@ -26,7 +27,7 @@ dependencies = [
     "tensorboard>=2.18.0",
     "torch-tb-profiler>=0.4.3",
 ]
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -40,12 +41,8 @@ url = "https://pypi.org/simple"
 name = "pypi"
 type = "index"
 
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
 [tool.pdm]
-distribution = true
+distribution = false
 resolution.backend = "uv"
 
 [tool.black]

@@ -1,12 +1,12 @@
 data:
-  raw_data_path: "data/raw/day_point_dataset_v5.csv"  # Path to your transactions file
-  app_mappings_path: "data/raw/app_mappings_2st_round.csv"  # Path to app mappings
-  exploded_df_path: "data/processed/exploded_df.pkl"  # Cache for exploded dataframe
-  sequences_path: "data/processed/sequences.pkl"  # Cache for sequences
-  vocab_path: "data/processed/app_to_idx.pkl"  # Cache for vocabulary
+  raw_data_path: "data/raw/day_point_dataset_v5.csv"
+  app_mappings_path: "data/raw/app_mappings_2st_round.csv" 
+  exploded_df_path: "data/processed/exploded_df.pkl"
+  sequences_path: "data/processed/sequences.pkl"
+  vocab_path: "data/processed/app_to_idx.pkl"
 
 model:
-  vocab_size: null  # Will be set automatically based on vocabulary
+  vocab_size: null
   seq_length: 64
   batch_size: 512
   learning_rate: 1e-4
@@ -22,7 +22,7 @@ training:
   test_size: 0.2
   random_seed: 42
   lr: 1e-4
-  device: "cuda"  # Will fall back to CPU if CUDA not available
+  device: "cuda"
   pretrained_model_path: "models/app_sequence_model_3st_round.pt"
   save_model_path: "models/app_sequence_model_4st_round.pt"
-  preload_dataset: true # Use preloaded dataset for faster training
+  preload_dataset: true
