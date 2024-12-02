@@ -4,6 +4,16 @@ data:
   exploded_df_path: "data/processed/exploded_df.pkl"  # Cache for exploded dataframe
   sequences_path: "data/processed/sequences.pkl"  # Cache for sequences
   vocab_path: "data/processed/app_to_idx.pkl"  # Cache for vocabulary
+  app_quality_path: "config/create_exploded_df.yaml"
+
+extra_inputs:
+  time: true
+  app_quality: true
+  mouseClicks: true
+  mouseScroll: true
+  keystrokes: true
+  mic: true
+  camera: true
 
 model:
   vocab_size: null  # Will be set automatically based on vocabulary
@@ -25,4 +35,4 @@ training:
   device: "cuda"  # Will fall back to CPU if CUDA not available
   pretrained_model_path: null
   save_model_path: "models/app_sequence_model_with_time_3st_round.pt"
-  preload_dataset: true # Use preloaded dataset for faster training
+  preload_dataset: false # Use preloaded dataset for faster training

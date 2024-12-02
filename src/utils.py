@@ -14,6 +14,7 @@ def validate_config(config: Dict[str, Any]) -> None:
         "data.exploded_df_path",
         "data.sequences_path",
         "data.vocab_path",
+        "data.app_quality_path"
     ]
 
     for path_key in required_paths:

@@ -30,9 +30,10 @@ def setup_data(cfg):
     if exploded_df is None:
         logger.info("Loading raw data and creating exploded_df")
         df_day_point, _ = load_raw_data(
-            data_paths["raw_data_path"], data_paths["app_mappings_path"]
+            data_paths["raw_data_path"],
+            data_paths["app_mappings_path"]
         )
-        exploded_df = create_exploded_df(df_day_point)
+        exploded_df = create_exploded_df(df_day_point, data_paths["app_quality_path"])
         safe_save_pickle(exploded_df, data_paths["exploded_df_path"])
 
     # Load or create sequences
@@ -62,6 +63,7 @@ def create_datasets(sequences, app_to_idx, cfg, device):
         app_to_idx,
         sequence_length=seq_length,
         mask_prob=cfg.get("training", {}).get("mask_prob", 0.15),
+        extra_inputs = cfg.get("extra_inputs", {})
     )
 
     df_sequences = pd.DataFrame(sequences)
@@ -80,11 +82,6 @@ def create_datasets(sequences, app_to_idx, cfg, device):
 
     train_dataset = Subset(dataset, train_idx)
     val_dataset = Subset(dataset, val_idx)
-
-    if cfg.get("training", {}).get("preload_dataset", False):
-        logger.info("Preloading dataset to device")
-        train_dataset = PreloadedDataset(train_dataset, device)
-        val_dataset = PreloadedDataset(val_dataset, device)
 
     return train_dataset, val_dataset, seq_length
 
@@ -127,12 +124,13 @@ def train(cfg):
             device,
         )
     else:
-        model = ShallowTransformerWithAttention(
+        model = ShallowTransformerTimeWithAttention(
             vocab_size=len(app_to_idx) + 1,  # +1 for MASK
             d_model=cfg.get("model", {}).get("d_model", 64),
             nhead=cfg.get("model", {}).get("nhead", 4),
             seq_length=seq_length,
             n_layers=cfg.get("model", {}).get("num_encoder_layers", 3),
+            cfg=cfg 
         ).to(device)
 
     # Setup training components
@@ -190,6 +188,6 @@ def train(cfg):
 
 if __name__ == "__main__":
     logger.info("Loading and validating configuration")
-    cfg_path = Path("config/train/default.yaml")
+    cfg_path = Path("config/train/default_time.yaml")
     cfg = load_config(cfg_path)
     train(cfg)

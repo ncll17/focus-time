@@ -1,3 +1,4 @@
+import yaml
 import pandas as pd
 from pandas import Timestamp
 import numpy as np
@@ -17,6 +18,11 @@ def process_row(row):
     durations = eval(row["app_durations"])
     start_times = eval(row["app_start_times"])
     end_times = eval(row["app_end_times"])
+    mouse_clicks = eval(row["mouseClicks"])
+    keystrokes = eval(row["keystrokes"])
+    mic = eval(row["mic"])
+    mouse_scroll = eval(row["mouseScroll"])
+    camera = eval(row["camera"])
 
     return pd.DataFrame(
         {
@@ -24,6 +30,11 @@ def process_row(row):
             "duration": durations,
             "app_start_time": start_times,
             "app_end_time": end_times,
+            "mouseClicks": mouse_clicks,
+            "keystrokes": keystrokes,
+            "mic": mic,
+            "mouseScroll": mouse_scroll,
+            "camera": camera,
             "employeeId": [row["employeeId"]] * len(apps),
             "workday_start": [row["start_time"]] * len(apps),
             "workday_end": [row["end_time"]] * len(apps),
@@ -33,14 +44,22 @@ def process_row(row):
     )
 
 
-def create_exploded_df(df_day_point):
+def create_exploded_df(df_day_point, app_quality_path):
     """Create exploded dataframe from day point data."""
+    # Load app quality mapping from yaml file
+    with open(app_quality_path, 'r') as file:
+        app_quality_mapping = yaml.safe_load(file)
+
+    # Create exploded dataframe
     exploded_df = pd.concat(
         [process_row(row) for _, row in df_day_point.iterrows()], ignore_index=True
     )
     exploded_df["duration"] = exploded_df["duration"] * 60  # Convert to seconds
-    return exploded_df
 
+    # Map app quality values, with a default value of 5 for missing apps
+    exploded_df["app_quality"] = exploded_df["app"].map(app_quality_mapping).fillna(5)
+
+    return exploded_df
 
 def create_sequences(exploded_df, window_size=64, stride=8):
     """Create sequences using sliding window approach."""
@@ -50,44 +69,44 @@ def create_sequences(exploded_df, window_size=64, stride=8):
     for (emp_id,), group in tqdm(
         df_sorted.groupby(["employeeId"]), desc="Creating sequences"
     ):
-        workday_start_time = pd.to_datetime(group["workday_start"].iloc[0])
-        delta_from_workday_start = np.log2(
-            np.maximum(
-                1,
-                (
-                    (
-                        pd.to_datetime(group["app_start_time"]) - workday_start_time
-                    ).dt.total_seconds()
-                ),
-            )
-        ).tolist()
-
         apps = group["app"].tolist()
-        # durations = np.log2(np.maximum(1, (pd.to_datetime(group['app_end_time']) -
-        #                                  pd.to_datetime(group['app_start_time'])).dt.total_seconds())).tolist()
-        durations = (
-            (
-                pd.to_datetime(group["app_end_time"])
-                - pd.to_datetime(group["app_start_time"])
-            ).dt.total_seconds()
-        ).tolist()
+        durations = group["duration"].tolist()
+
+        mouse_clicks = group["mouseClicks"].tolist()
+        keystrokes = group["keystrokes"].tolist()
+        mic = group["mic"].tolist()
+        mouse_scroll = group["mouseScroll"].tolist()
+        camera = group["camera"].tolist()
+        app_quality = group["app_quality"].tolist()
 
         for start_idx in range(0, len(apps), stride):
             end_idx = start_idx + window_size
+
             window_apps = apps[start_idx:end_idx]
             window_durations = durations[start_idx:end_idx]
+            window_mouse_clicks = mouse_clicks[start_idx:end_idx]
+            window_keystrokes = keystrokes[start_idx:end_idx]
+            window_mic = mic[start_idx:end_idx]
+            window_mouse_scroll = mouse_scroll[start_idx:end_idx]
+            window_camera = camera[start_idx:end_idx]
+            window_app_quality = app_quality[start_idx:end_idx]
 
             if len(window_apps) >= 4:
                 sequence = {
                     "apps": window_apps,
                     "durations": window_durations,
+                    "mouseClicks": window_mouse_clicks,
+                    "keystrokes": window_keystrokes,
+                    "mic": window_mic,
+                    "mouseScroll": window_mouse_scroll,
+                    "camera": window_camera,
+                    "app_quality": window_app_quality,
                     "employeeId": emp_id,
                     "window_start_idx": start_idx,
                 }
                 sequences.append(sequence)
 
     return sequences
-
 
 def create_vocab(sequences):
     """Create vocabulary mapping from sequences."""
