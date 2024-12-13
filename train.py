@@ -8,16 +8,16 @@ import yaml
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
-from data.load_and_preprocess import (
+from src.data.load_and_preprocess import (
     load_raw_data,
     create_exploded_df,
     create_sequences,
     create_vocab,
 )
-from data.datasets import AppSequenceDataset, PreloadedDataset
-from models.transformer_models import ShallowTransformerWithAttention
-from training.iterations import train_epoch, evaluate
-from utils import load_config, safe_load_pickle, safe_save_pickle, load_model
+from src.data.datasets import AppSequenceDataset, PreloadedDataset
+from src.models.transformer_models import ShallowTransformerTimeWithAttention
+from src.training.iterations import train_epoch, evaluate
+from src.utils import load_config, safe_load_pickle, safe_save_pickle, load_model
 
 
 def setup_data(cfg):
@@ -82,6 +82,11 @@ def create_datasets(sequences, app_to_idx, cfg, device):
     train_dataset = Subset(dataset, train_idx)
     val_dataset = Subset(dataset, val_idx)
 
+    if cfg.get("training", {}).get("preload_dataset", False):
+        logger.info("Preloading dataset to device")
+        train_dataset = PreloadedDataset(train_dataset, device)
+        val_dataset = PreloadedDataset(val_dataset, device)
+
     return train_dataset, val_dataset, seq_length
 
 
@@ -118,7 +123,7 @@ def train(cfg):
         model, app_to_idx = load_model(
             cfg.get("training", {}).get("pretrained_model_path"),
             cfg,
-            ShallowTransformerWithAttention,
+            ShallowTransformerTimeWithAttention,
             cfg,
             device,
         )

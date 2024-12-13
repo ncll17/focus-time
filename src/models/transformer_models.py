@@ -184,55 +184,57 @@ class ShallowTransformerTimeWithAttention(nn.Module):
         # Linear layer to project back to vocabulary size from combined embedding size
         self.app_predictor = nn.Linear(self.combined_d_model, vocab_size)
 
-    def forward(self, app_ids, durations, attention_mask, **kwargs):
+    def forward(self, app_ids, attention_mask, **kwargs):
         # Get app embeddings
         x_apps = self.app_embeddings(app_ids)  # [batch_size, seq_len, d_model]
 
-        # Project durations to d_model size
-        x_durations = self.duration_projection(
-            durations.unsqueeze(-1)
-        )  # [batch_size, seq_len, d_model]
-
         # Collect all features to concatenate
-        features = [x_apps, x_durations]
+        features = [x_apps]
 
-        # Add mouseClicks projection if specified in cfg
-        if self.extra_inputs.get("mouseClicks", False):
+        # Handle durations if provided in kwargs
+        if "durations" in kwargs:
+            x_durations = self.duration_projection(
+                kwargs["durations"].unsqueeze(-1)
+            )  # [batch_size, seq_len, d_model]
+            features.append(x_durations)
+
+        # Add mouseClicks projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("mouseClicks", False) and "mouseClicks" in kwargs:
             x_mouse_clicks = self.mouse_clicks_projection(
                 kwargs["mouseClicks"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]
             features.append(x_mouse_clicks)
 
-        # Add mouseScroll projection if specified in cfg
-        if self.extra_inputs.get("mouseScroll", False):
+        # Add mouseScroll projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("mouseScroll", False) and "mouseScroll" in kwargs:
             x_mouse_scroll = self.mouse_scroll_projection(
                 kwargs["mouseScroll"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]
             features.append(x_mouse_scroll)
 
-        # Add keystrokes projection if specified in cfg
-        if self.extra_inputs.get("keystrokes", False):
+        # Add keystrokes projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("keystrokes", False) and "keystrokes" in kwargs:
             x_keystrokes = self.keystrokes_projection(
                 kwargs["keystrokes"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]
             features.append(x_keystrokes)
 
-        # Add mic projection if specified in cfg
-        if self.extra_inputs.get("mic", False):
+        # Add mic projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("mic", False) and "mic" in kwargs:
             x_mic = self.mic_projection(
                 kwargs["mic"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]
             features.append(x_mic)
 
-        # Add camera projection if specified in cfg
-        if self.extra_inputs.get("camera", False):
+        # Add camera projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("camera", False) and "camera" in kwargs:
             x_camera = self.camera_projection(
                 kwargs["camera"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]
             features.append(x_camera)
 
-        # Add app_quality projection if specified in cfg
-        if self.extra_inputs.get("app_quality", False):
+        # Add app_quality projection if specified in cfg and provided in kwargs
+        if self.extra_inputs.get("app_quality", False) and "app_quality" in kwargs:
             x_app_quality = self.app_quality_projection(
                 kwargs["app_quality"].unsqueeze(-1)
             )  # [batch_size, seq_len, d_model]

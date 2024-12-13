@@ -3,11 +3,12 @@ import pandas as pd
 from pandas import Timestamp
 import numpy as np
 from tqdm import tqdm
+from ast import literal_eval
 
 
 def load_raw_data(transactions_file, app_mappings_file):
     """Load raw data from CSV files."""
-    df_day_point = pd.read_csv(transactions_file, sep=";", index_col=0)
+    df_day_point = pd.read_csv(transactions_file, index_col=0)
     df_app_to_class = pd.read_csv(app_mappings_file)
     return df_day_point, df_app_to_class
 
@@ -50,6 +51,7 @@ def create_exploded_df(df_day_point, app_quality_path):
     with open(app_quality_path, "r") as file:
         app_quality_mapping = yaml.safe_load(file)
 
+    print(f"Columns: {df_day_point.columns}")
     # Create exploded dataframe
     exploded_df = pd.concat(
         [process_row(row) for _, row in df_day_point.iterrows()], ignore_index=True

@@ -36,7 +36,10 @@ def train_epoch(
 
         # Forward pass: passing extra inputs dynamically based on model configuration
         outputs = model(
-            app_ids, attention_mask, **extra_inputs, output_attentions=output_attentions
+            app_ids=app_ids,
+            attention_mask=attention_mask,
+            **extra_inputs,
+            output_attentions=output_attentions,
         )
 
         if output_attentions:
@@ -92,8 +95,8 @@ def evaluate(model, dataloader, criterion, device, output_attentions=False):
 
             # Forward pass: passing extra inputs dynamically based on model configuration
             outputs = model(
-                app_ids,
-                attention_mask,
+                app_ids=app_ids,
+                attention_mask=attention_mask,
                 **extra_inputs,
                 output_attentions=output_attentions,
             )

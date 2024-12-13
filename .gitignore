@@ -166,3 +166,7 @@ cython_debug/
 config/keys.yaml
 runs/
 *.html
+
+# Ignore created data
+src/data/processed/
+src/data/raw/
