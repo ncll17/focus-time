@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Install PDM if not available
-if ! command -v pdm &> /dev/null; then
-    pip install --user pdm
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+# Ensure PDM is installed
+pip install pdm
 
-# Ensure PDM is in PATH
-export PATH="$HOME/.local/bin:$PATH"
+# Export dependencies to requirements.txt
+pdm export --without-hashes --format requirements.txt --output requirements.txt
 
-# Install dependencies from pdm.lock
-pdm install
+# Install dependencies
+pip install -r requirements.txt
 
 # Run your Python script
 python train.py
