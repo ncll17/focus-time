@@ -1,3 +1,4 @@
+import os
 from loguru import logger
 import torch
 import pandas as pd
@@ -32,7 +33,14 @@ def setup_data(cfg):
         df_day_point, _ = load_raw_data(
             data_paths["raw_data_path"], data_paths["app_mappings_path"]
         )
-        exploded_df = create_exploded_df(df_day_point, data_paths["app_quality_path"])
+
+        # Get the directory of the current script
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Build the full path to the config file
+        app_quality_path = os.path.join(current_dir, data_paths["app_quality_path"])
+
+        exploded_df = create_exploded_df(df_day_point, app_quality_path)
         safe_save_pickle(exploded_df, data_paths["exploded_df_path"])
 
     # Load or create sequences
@@ -192,6 +200,13 @@ def train(cfg):
 
 if __name__ == "__main__":
     logger.info("Loading and validating configuration")
-    cfg_path = Path("config/train/default_time.yaml")
+    # cfg_path = Path("config/train/default_time.yaml")
+
+    # Get the directory of the current script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Build the full path to the config file
+    cfg_path = os.path.join(current_dir, "config/train/default_time.yaml")
+
     cfg = load_config(cfg_path)
     train(cfg)
