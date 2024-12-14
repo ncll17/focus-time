@@ -118,8 +118,6 @@ tensorboard==2.18.0
 tensorboard-data-server==0.7.2
 threadpoolctl==3.5.0
 tokenizers==0.20.3
-torch==2.5.1+cu118
-torch-tb-profiler==0.4.3
 tornado==6.4.1
 tqdm==4.67.0
 traitlets==5.14.3
