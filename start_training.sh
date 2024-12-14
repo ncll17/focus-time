@@ -10,7 +10,7 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # Install dependencies from pdm.lock
-pdm install --lock || { echo "Failed to install dependencies"; exit 1; }
+pdm install
 
 # Run your Python script
 python train.py
