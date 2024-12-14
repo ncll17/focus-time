@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Ensure PDM is installed
-pip install pdm
+echo "Upgrading pip to the latest version..."
+pip install --upgrade pip || { echo "Failed to upgrade pip"; exit 1; }
 
-# Export dependencies to requirements.txt
-pdm export --without-hashes --format requirements.txt --output requirements.txt
+# Install dependencies from requirements.txt
+echo "Installing dependencies from requirements.txt..."
+pip install -r requirements.txt || { echo "Failed to install dependencies"; exit 1; }
 
-# Install dependencies
-pip install -r requirements.txt
+echo "All dependencies installed successfully."
 
 # Run your Python script
 python train.py
