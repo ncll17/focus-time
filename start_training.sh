@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python /exp/pipeline/train.py
+python train.py
