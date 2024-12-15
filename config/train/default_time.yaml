@@ -1,9 +1,9 @@
 data:
-  raw_data_path: "src/data/raw/processed_data.csv"  # Path to your transactions file
-  app_mappings_path: "src/data/raw/app_mappings_2st_round.csv"  # Path to app mappings
-  exploded_df_path: "src/data/processed/exploded_df.pkl"  # Cache for exploded dataframe
-  sequences_path: "src/data/processed/sequences.pkl"  # Cache for sequences
-  vocab_path: "src/data/processed/app_to_idx.pkl"  # Cache for vocabulary
+  raw_data_path: "/src/data/raw/processed_data.csv"  # Path to your transactions file
+  app_mappings_path: "/src/data/raw/app_mappings_2st_round.csv"  # Path to app mappings
+  exploded_df_path: "/out/exploded_df.pkl"  # Cache for exploded dataframe
+  sequences_path: "/out/sequences.pkl"  # Cache for sequences
+  vocab_path: "/out/app_to_idx.pkl"  # Cache for vocabulary
   app_quality_path: "config/app_productivity_scores.yaml"
 
 extra_inputs:
