@@ -1,5 +1,6 @@
 import os
 from loguru import logger
+import numpy as np
 import torch
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -174,7 +175,13 @@ def train(cfg):
         writer.add_scalar("Learning_rate", optimizer.param_groups[0]["lr"], epoch)
 
         for name, param in model.named_parameters():
-            writer.add_histogram(f"Parameters/{name}", param.data, epoch)
+            try:
+                if param.requires_grad and isinstance(param.data, torch.Tensor):
+                    writer.add_histogram(
+                        f"Parameters/{name}", param.data.detach().cpu().numpy(), epoch
+                    )
+            except Exception as e:
+                print(f"Failed to log parameter {name}: {e}")
 
         logger.info(f"Epoch {epoch+1}/{n_epochs}")
         logger.info(f"Train Loss: {train_loss:.4f}")
