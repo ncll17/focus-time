@@ -8,12 +8,12 @@ data:
 
 extra_inputs:
   time: true
-  app_quality: false
-  mouseClicks: false
-  mouseScroll: false
-  keystrokes: false
-  mic: false
-  camera: false
+  app_quality: true
+  mouseClicks: true
+  mouseScroll: true
+  keystrokes: true
+  mic: true
+  camera: true
 
 model:
   vocab_size: null  # Will be set automatically based on vocabulary
