@@ -1,5 +1,5 @@
 data:
-  raw_data_path: "/src/data/raw/day_point_dataset_50_rows_aditional_features.csv"  # Path to your transactions file
+  raw_data_path: "/src/data/raw/processed_data.csv"  # Path to your transactions file
   app_mappings_path: "/src/data/raw/app_mappings_2st_round.csv"  # Path to app mappings
   exploded_df_path: "/out/exploded_df.pkl"  # Cache for exploded dataframe
   sequences_path: "/out/sequences.pkl"  # Cache for sequences
