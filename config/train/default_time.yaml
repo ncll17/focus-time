@@ -7,7 +7,7 @@ data:
   app_quality_path: "config/app_productivity_scores.yaml"
 
 extra_inputs:
-  time: true
+  time: false
   app_quality: false
   mouseClicks: false
   mouseScroll: false
