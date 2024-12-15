@@ -35,11 +35,18 @@ def train_epoch(
         optimizer.zero_grad()
 
         # Forward pass: passing extra inputs dynamically based on model configuration
+        # outputs = model(
+        #     app_ids=app_ids,
+        #     attention_mask=attention_mask,
+        #     **extra_inputs,
+        #     output_attentions=output_attentions,
+        # )
+
         outputs = model(
             app_ids=app_ids,
             attention_mask=attention_mask,
-            **extra_inputs,
             output_attentions=output_attentions,
+            **extra_inputs,
         )
 
         if output_attentions:
