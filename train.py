@@ -207,6 +207,7 @@ if __name__ == "__main__":
 
     # Build the full path to the config file
     cfg_path = os.path.join(current_dir, "config/train/default_time.yaml")
+    cfg_path = Path(cfg_path)
 
     cfg = load_config(cfg_path)
     train(cfg)
