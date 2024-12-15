@@ -25,6 +25,9 @@ def process_row(row):
     mouse_scroll = eval(row["mouseScroll"])
     camera = eval(row["camera"])
 
+    # Access employeeId from the index (row.name)
+    employee_id = row.name
+
     return pd.DataFrame(
         {
             "app": apps,
@@ -36,7 +39,7 @@ def process_row(row):
             "mic": mic,
             "mouseScroll": mouse_scroll,
             "camera": camera,
-            "employeeId": [row["employeeId"]] * len(apps),
+            "employeeId": [employee_id] * len(apps),
             "workday_start": [row["start_time"]] * len(apps),
             "workday_end": [row["end_time"]] * len(apps),
             "workday_duration": [row["workday_duration"]] * len(apps),
