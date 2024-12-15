@@ -161,6 +161,51 @@ def train(cfg):
     logger.info("Starting training loop")
     n_epochs = cfg.get("training", {}).get("num_epochs", 10)
 
+    # for epoch in range(n_epochs):
+    #     train_loss, train_accuracy = train_epoch(
+    #         model, train_loader, optimizer, criterion, device
+    #     )
+    #     val_loss, val_accuracy = evaluate(model, val_loader, criterion, device)
+
+    #     # Log metrics
+    #     writer.add_scalar("Loss/train", train_loss, epoch)
+    #     writer.add_scalar("Accuracy/train", train_accuracy, epoch)
+    #     writer.add_scalar("Loss/validation", val_loss, epoch)
+    #     writer.add_scalar("Accuracy/validation", val_accuracy, epoch)
+    #     writer.add_scalar("Learning_rate", optimizer.param_groups[0]["lr"], epoch)
+
+    #     for name, param in model.named_parameters():
+    #         try:
+    #             if param.requires_grad and isinstance(param.data, torch.Tensor):
+    #                 writer.add_histogram(
+    #                     f"Parameters/{name}", param.data.detach().cpu().numpy(), epoch
+    #                 )
+    #         except Exception as e:
+    #             print(f"Failed to log parameter {name}: {e}")
+
+    #     logger.info(f"Epoch {epoch+1}/{n_epochs}")
+    #     logger.info(f"Train Loss: {train_loss:.4f}")
+    #     logger.info(f"Train Accuracy: {train_accuracy:.4f}")
+    #     logger.info(f"Val Loss: {val_loss:.4f}")
+    #     logger.info(f"Val Accuracy: {val_accuracy:.4f}")
+
+    # writer.close()
+
+    # # Save model if specified
+    # if cfg.get("training", {}).get("save_model_path", None):
+    #     logger.info("Saving model checkpoint")
+    #     model_path = Path(cfg.get("training", {}).get("save_model_path"))
+    #     torch.save(
+    #         {
+    #             "model_state_dict": model.state_dict(),
+    #             "optimizer_state_dict": optimizer.state_dict(),
+    #             "app_to_idx": app_to_idx,
+    #         },
+    #         model_path,
+    #     )
+
+    best_val_accuracy = 0.0  # Initialize best validation accuracy
+
     for epoch in range(n_epochs):
         train_loss, train_accuracy = train_epoch(
             model, train_loader, optimizer, criterion, device
@@ -189,20 +234,25 @@ def train(cfg):
         logger.info(f"Val Loss: {val_loss:.4f}")
         logger.info(f"Val Accuracy: {val_accuracy:.4f}")
 
-    writer.close()
+        # Check if the current validation accuracy is the best
+        if val_accuracy > best_val_accuracy:
+            best_val_accuracy = val_accuracy  # Update the best accuracy
+            logger.info(f"New best validation accuracy: {best_val_accuracy:.4f}")
 
-    # Save model if specified
-    if cfg.get("training", {}).get("save_model_path", None):
-        logger.info("Saving model checkpoint")
-        model_path = Path(cfg.get("training", {}).get("save_model_path"))
-        torch.save(
-            {
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "app_to_idx": app_to_idx,
-            },
-            model_path,
-        )
+            # Save the model checkpoint
+            if cfg.get("training", {}).get("save_model_path", None):
+                logger.info("Saving new best model checkpoint")
+                model_path = Path(cfg.get("training", {}).get("save_model_path"))
+                torch.save(
+                    {
+                        "model_state_dict": model.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict(),
+                        "app_to_idx": app_to_idx,
+                    },
+                    model_path,
+                )
+
+    writer.close()
 
 
 if __name__ == "__main__":

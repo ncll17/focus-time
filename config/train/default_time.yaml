@@ -27,12 +27,12 @@ model:
   dropout: 0.1
 
 training:
-  num_epochs: 10
+  num_epochs: 200
   mask_prob: 0.15
   test_size: 0.2
   random_seed: 42
   lr: 1e-4
   device: "cuda"  # Will fall back to CPU if CUDA not available
   pretrained_model_path: null
-  save_model_path: "src/models/app_sequence_model_all_parameters_testing.pt"
+  save_model_path: "/out/app_sequence_model_apps.pt"
   preload_dataset: true
