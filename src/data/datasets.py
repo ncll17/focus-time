@@ -116,15 +116,16 @@ class AppSequenceDataset(Dataset):
 
         return output
 
-    class PreloadedDataset(Dataset):
-        def __init__(self, original_dataset, device):
-            self.data = []
-            for i in tqdm(range(len(original_dataset))):
-                batch = original_dataset[i]
-                self.data.append({k: v.to(device) for k, v in batch.items()})
 
-        def __len__(self):
-            return len(self.data)
+class PreloadedDataset(Dataset):
+    def __init__(self, original_dataset, device):
+        self.data = []
+        for i in tqdm(range(len(original_dataset))):
+            batch = original_dataset[i]
+            self.data.append({k: v.to(device) for k, v in batch.items()})
 
-        def __getitem__(self, idx):
-            return self.data[idx]
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
