@@ -560,23 +560,40 @@ class ShallowTransformerTimeWithAttention(nn.Module):
 
         # Add mic projection if specified in cfg and provided in kwargs
         if self.mic_projection:
+            # x_mic = self.mic_projection(
+            #     kwargs["mic"].unsqueeze(-1)
+
+            # )  # [batch_size, seq_len, d_model]
+
             x_mic = self.mic_projection(
-                kwargs["mic"].unsqueeze(-1)
-            )  # [batch_size, seq_len, d_model]
+                kwargs["mic"].unsqueeze(-1).to(self.mic_projection.weight.dtype)
+            )
+
             features.append(x_mic)
 
         # Add camera projection if specified in cfg and provided in kwargs
         if self.camera_projection:
+            # x_camera = self.camera_projection(
+            #     kwargs["camera"].unsqueeze(-1)
+            # )
+
             x_camera = self.camera_projection(
-                kwargs["camera"].unsqueeze(-1)
-            )  # [batch_size, seq_len, d_model]
+                kwargs["camera"].unsqueeze(-1).to(self.camera_projection.weight.dtype)
+            )
             features.append(x_camera)
 
         # Add app_quality projection if specified in cfg and provided in kwargs
         if self.app_quality_projection:
+            # x_app_quality = self.app_quality_projection(
+            #     kwargs["app_quality"].unsqueeze(-1)
+            # )
+
             x_app_quality = self.app_quality_projection(
-                kwargs["app_quality"].unsqueeze(-1)
-            )  # [batch_size, seq_len, d_model]
+                kwargs["app_quality"]
+                .unsqueeze(-1)
+                .to(self.app_quality_projection.weight.dtype)
+            )
+
             features.append(x_app_quality)
 
         # Concatenate along the feature dimension
