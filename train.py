@@ -91,10 +91,10 @@ def create_datasets(sequences, app_to_idx, cfg, device):
     train_dataset = Subset(dataset, train_idx)
     val_dataset = Subset(dataset, val_idx)
 
-    if cfg.get("training", {}).get("preload_dataset", False):
-        logger.info("Preloading dataset to device")
-        train_dataset = PreloadedDataset(train_dataset, device)
-        val_dataset = PreloadedDataset(val_dataset, device)
+    # if cfg.get("training", {}).get("preload_dataset", False):
+    #     logger.info("Preloading dataset to device")
+    #     train_dataset = PreloadedDataset(train_dataset, device)
+    #     val_dataset = PreloadedDataset(val_dataset, device)
 
     return train_dataset, val_dataset, seq_length
 
