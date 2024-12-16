@@ -1,5 +1,4 @@
 import torch
-from tqdm import tqdm
 import torch.nn.functional as F
 
 
@@ -12,7 +11,8 @@ def train_epoch(
     correct_predictions = 0
     total_predictions = 0
 
-    for batch in tqdm(dataloader, desc="Training"):
+    # for batch in tqdm(dataloader, desc="Training"):
+    for batch in dataloader:
         # Move input tensors to the appropriate device (GPU/CPU)
         app_ids = batch["app_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
@@ -80,7 +80,8 @@ def evaluate(model, dataloader, criterion, device, output_attentions=False):
     total_predictions = 0
 
     with torch.no_grad():
-        for batch in tqdm(dataloader, desc="Evaluating"):
+        # for batch in tqdm(dataloader, desc="Evaluating"):
+        for batch in dataloader:
             # Move input tensors to the appropriate device (GPU/CPU)
             app_ids = batch["app_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)

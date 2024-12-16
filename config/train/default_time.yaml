@@ -7,17 +7,17 @@ data:
   app_quality_path: "config/app_productivity_scores.yaml"
 
 extra_inputs:
-  time: true
-  app_quality: true
-  mouseClicks: true
-  mouseScroll: true
-  keystrokes: true
-  mic: true
-  camera: true
+  time: false
+  app_quality: false
+  mouseClicks: false
+  mouseScroll: false
+  keystrokes: false
+  mic: false
+  camera: false
 
 model:
   vocab_size: null  # Will be set automatically based on vocabulary
-  seq_length: 64
+  seq_length: 16
   batch_size: 512
   learning_rate: 1e-4
   d_model: 64
